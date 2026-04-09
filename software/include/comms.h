@@ -9,6 +9,7 @@ class SensorManager;
 class LedController;
 class MotorDriver;
 class GridNavigator;
+class DashboardState;
 
 typedef struct {
   uint8_t id;
@@ -48,6 +49,7 @@ class EspNowManager {
   void sendStop();
   void sendBroadcastCommand(const char* command);
   void handleCommand(const char* command);
+  void attachDashboard(DashboardState* dashboard);
 
  private:
   void sendNow(unsigned long now);
@@ -59,6 +61,7 @@ class EspNowManager {
   SensorManager& sensors_;
   LedController* led_ = nullptr;
   GridNavigator* gridNav_ = nullptr;
+  DashboardState* dashboard_ = nullptr;
   CommsStatus status_;
   uint32_t lastMsgHash_ = 0;
   unsigned long lastMsgMs_ = 0;

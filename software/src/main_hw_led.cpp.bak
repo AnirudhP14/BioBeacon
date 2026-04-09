@@ -1,0 +1,16 @@
+#include <Arduino.h>
+
+#define LED_PIN 21
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(LED_PIN, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(LED_PIN, HIGH);  // LED ON
+  delay(500);
+  digitalWrite(LED_PIN, LOW);   // LED OFF
+  delay(500);
+  Serial.println("LED TOGGLED\n");
+}

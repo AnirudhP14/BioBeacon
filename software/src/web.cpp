@@ -1,7 +1,9 @@
 #include "web.h"
 
 #include "comms.h"
+#include "chart_asset.h"
 #include "config.h"
+#include "dashboard_state.h"
 #include "drive.h"
 #include "grid_nav.h"
 #include "logging.h"
@@ -13,21 +15,34 @@ WebServerManager::WebServerManager(
     DriveController& drive,
     StatusBuilder& statusBuilder,
     GridNavigator& gridNav,
-    EspNowManager& comms)
-    : log_(log), drive_(drive), statusBuilder_(statusBuilder), gridNav_(gridNav), comms_(comms), server_(80) {}
+    EspNowManager& comms,
+    DashboardState& dashboard)
+    : log_(log),
+      drive_(drive),
+      statusBuilder_(statusBuilder),
+      gridNav_(gridNav),
+      comms_(comms),
+      dashboard_(dashboard),
+      server_(80) {}
 
 void WebServerManager::begin() {
-  server_.on("/", [this]() { handleRoot(); });
+  server_.on("/", [this]() { handleDashboardPage(); });
   server_.on("/status", [this]() { handleStatus(); });
   server_.on("/clear", [this]() { handleClear(); });
   server_.on("/drive", [this]() { handleDrive(); });
   server_.on("/swarm_timed_grid_scan", HTTP_GET, [this]() { handleSwarmTimedGridScan(); });
+  server_.on("/ops/dashboard", HTTP_GET, [this]() { handleOpsDashboard(); });
+  server_.on("/static/chart.min.js", HTTP_GET, [this]() { handleChartAsset(); });
+  server_.on("/logs", HTTP_GET, [this]() { handleRoot(); });
   server_.begin();
 
   log_.logMsg("HTTP server started");
   log_.logMsg("Endpoints:");
-  log_.logMsg("  /        -> logs");
+  log_.logMsg("  /        -> dashboard");
+  log_.logMsg("  /logs    -> logs");
   log_.logMsg("  /status  -> health");
+  log_.logMsg("  /ops/dashboard -> mission ui");
+  log_.logMsg("  /static/chart.min.js -> local charts");
   log_.logMsg("  /clear   -> clear logs");
   log_.logMsg("  /drive   -> path");
 }
@@ -42,6 +57,19 @@ bool WebServerManager::co2TestEnabled() const {
 
 void WebServerManager::handleRoot() {
   server_.send(200, "text/plain", log_.buffer());
+}
+
+void WebServerManager::handleDashboardPage() {
+  server_.send(200, "text/html", dashboardHtml());
+}
+
+void WebServerManager::handleOpsDashboard() {
+  String json = dashboard_.buildDashboardJson(millis());
+  server_.send(200, "application/json", json);
+}
+
+void WebServerManager::handleChartAsset() {
+  server_.send(200, "application/javascript", localChartJs());
 }
 
 void WebServerManager::handleStatus() {
@@ -101,6 +129,7 @@ void WebServerManager::handleDrive() {
 
   if (mode == "stop") {
     comms_.sendStop();
+    dashboard_.onLocalCommand("drive_stop", millis());
     server_.send(200, "text/plain", "Stop sent");
     return;
   }
@@ -108,12 +137,14 @@ void WebServerManager::handleDrive() {
   if (mode == "resume") {
     drive_.setMode(DriveMode::Auto);
     gridNav_.setEnabled(false);
+    dashboard_.onLocalCommand("drive_resume", millis());
     server_.send(200, "text/plain", "Resumed");
     return;
   }
 
   if (mode == "co2test") {
     co2TestMode_ = !co2TestMode_;
+    dashboard_.onLocalCommand(co2TestMode_ ? "co2test_on" : "co2test_off", millis());
     server_.send(200, "text/plain", co2TestMode_ ? "CO2 test ON" : "CO2 test OFF");
     return;
   }
@@ -180,6 +211,7 @@ void WebServerManager::handleDrive() {
 
     gridNav_.setEnabled(true);
     drive_.setMode(DriveMode::Auto);
+    dashboard_.onLocalCommand("grid_enable", millis());
     server_.send(200, "text/plain", "Grid traversal enabled");
     return;
   }
@@ -198,6 +230,7 @@ void WebServerManager::handleDrive() {
   }
 
   drive_.setMode(DriveMode::Path);
+  dashboard_.onLocalCommand("path_accept", millis());
   // LED STOP latch is cleared when drive becomes active in loop.
   server_.send(200, "text/plain", "Path accepted");
 }
@@ -205,5 +238,6 @@ void WebServerManager::handleDrive() {
 void WebServerManager::handleSwarmTimedGridScan() {
   comms_.sendBroadcastCommand("run_swarm_timed_scan");
   comms_.handleCommand("run_swarm_timed_scan");
+  dashboard_.onLocalCommand("run_swarm_timed_scan", millis());
   server_.send(200, "text/plain", "Swarm Timed Grid Scan command broadcasted");
 }

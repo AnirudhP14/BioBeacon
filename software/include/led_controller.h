@@ -18,6 +18,7 @@ class LedController {
   void setDriveMode();
   void setPaused();
   void setError();
+  void setColor(uint8_t r, uint8_t g, uint8_t b);
 
   void setCO2High(bool enabled);
   void setRemoteCO2(bool enabled);
@@ -51,6 +52,8 @@ class LedController {
   bool co2High_ = false;
   bool remoteCo2_ = false;
   bool stopLatched_ = false;
+  bool manualOverride_ = false;
+  Color manualColor_{0, 0, 0};
 
   unsigned long heartbeatStartMs_ = 0;
   unsigned long commandStartMs_ = 0;

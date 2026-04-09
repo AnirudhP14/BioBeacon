@@ -2,6 +2,7 @@
 #define SWARMBOT_CONFIG_H
 
 #include <Arduino.h>
+#include "pins.h"
 
 namespace config {
 constexpr bool RUN_BOOT_DIAGNOSTICS = true;
@@ -9,29 +10,16 @@ constexpr bool RUN_BOOT_DIAGNOSTICS = true;
 constexpr const char* WIFI_SSID_BASE = "firefly";
 constexpr const char* WIFI_PASS = "debug123";
 
-// Motor driver pins (Arduino Nano ESP32 pin labels -> GPIO)
-constexpr int AIN1 = 5;
-constexpr int AIN2 = 6;
-constexpr int PWMA = 9;
-constexpr int BIN1 = 7;
-constexpr int BIN2 = 8;
-constexpr int PWMB = 10;
-constexpr int STBY = 4;
-
-// Encoder pins (C1/C2)
-constexpr int ENCA_C1 = 2;
-constexpr int ENCA_C2 = 3;
-constexpr int ENCB_C1 = 11;
-constexpr int ENCB_C2 = 12;
 
 // ESP-NOW
-constexpr uint8_t DEVICE_ID = 1;
+constexpr uint8_t DEVICE_ID = 5;
 constexpr uint8_t SWARM_ID = 1;
+constexpr uint8_t EXPECTED_ROBOTS = 5;
 
 constexpr int OFFSET_A = 1;
 constexpr int OFFSET_B = 1;
-constexpr int ALIGN_A = (DEVICE_ID == 3) ? 1 : -1;
-constexpr int ALIGN_B = -1; // (DEVICE_ID == 1) ? 1 : -1;
+constexpr int ALIGN_A = (DEVICE_ID == 1) ? 1 : -1; //used to be 3 here
+constexpr int ALIGN_B = -1; // (DEVICE_ID == 1) ? 1 : -1;   
 
 constexpr float WHEEL_DIAM_MM = 53.0f;
 constexpr int QUADRATURE = 4;
@@ -49,7 +37,7 @@ constexpr unsigned long RANDOM_STEP_MAX_MS = 900;
 constexpr int MAX_PATH_STEPS = 16;
 
 // Grid navigation
-constexpr bool ENABLE_GRID_NAV = true;
+constexpr bool ENABLE_GRID_NAV = false;
 constexpr int GRID_WIDTH = 5;
 constexpr int GRID_HEIGHT = 4;
 constexpr float CELL_WIDTH_MM = 500.0f;
@@ -66,11 +54,6 @@ constexpr float TIMED_FORWARD_SEC_PER_CELL = 1.25f;  // Calibrate: time to move 
 constexpr float TIMED_TURN_90_SEC = 0.285f;           // Calibrate: time for 90 deg spot turn at TURN_SPEED 0.25 (0.31 for dev 1)
 constexpr int TIMED_DRIVE_SPEED = 500;             // PWM value
 constexpr unsigned long SCAN_BRAKE_MS = 500;
-
-// RGB LED pins (common cathode)
-constexpr int LED_PIN_R = A0;  // A6 to A0
-constexpr int LED_PIN_G = A6;  // A7 to A1
-constexpr int LED_PIN_B = A7; //TX1 to D13 to A2
 
 constexpr uint8_t SENSOR_CO2 = 1;
 constexpr uint8_t SENSOR_TVOC = 2;

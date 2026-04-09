@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BioBeacon - Hive Mind (Gridstack)</title>
+  <link href="https://cdn.jsdelivr.net/npm/gridstack@latest/dist/gridstack.min.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/gridstack@latest/dist/gridstack-all.min.js"></script>
+  <style>
+    :root{--bg:#a0c2db;--panel:#F6D649;--panel-2:#f2cc2c;--line:rgba(0,0,0,.22);--text:#141414;--muted:#2b2b2b}
+    body{margin:0;font-family:ui-sans-serif,system-ui;background:var(--bg);color:var(--text);padding:20px}
+    .grid-stack{background:var(--bg);gap:16px}
+    .grid-stack-item-content{background:linear-gradient(180deg,rgba(246,214,73,.98),rgba(240,206,53,.98));border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 18px 48px rgba(0,0,0,.12);height:100%;overflow:auto}
+    .grid-stack-item-content h2{margin:0 0 12px;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--text)}
+  </style>
+</head>
+<body>
+  <div class="grid-stack"></div>
+
+  <script>
+    const grid = GridStack.init({
+      column: 12,
+      cellHeight: 80,
+      margin: 16,
+      disableOneColumnMode: true
+    });
+
+    // Add panels matching original layout
+    grid.addWidget({x:0,y:0,w:12,h:1,content:'<h2>Hero Header</h2><p>Live mission telemetry</p>'});
+    grid.addWidget({x:0,y:1,w:12,h:2,content:'<h2>Summary Metrics</h2>'});
+    grid.addWidget({x:0,y:3,w:12,h:3,content:'<h2>Robot Cards</h2>'});
+    grid.addWidget({x:0,y:6,w:8,h:6,content:'<h2>Live Map</h2>'});
+    grid.addWidget({x:8,y:6,w:4,h:6,content:'<h2>Mission Charts</h2>'});
+    grid.addWidget({x:0,y:12,w:4,h:5,content:'<h2>Timeline</h2>'});
+    grid.addWidget({x:4,y:12,w:4,h:5,content:'<h2>Comms Peers</h2>'});
+    grid.addWidget({x:8,y:12,w:4,h:5,content:'<h2>Raw Drill-Down</h2>'});
+  </script>
+</body>
+</html>

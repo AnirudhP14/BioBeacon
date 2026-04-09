@@ -38,16 +38,19 @@ const char* motorStateLabel(MotorState state) {
 
 void MotorDriver::begin(Logger& log) {
   log_ = &log;
+  pinMode(config::STBY, OUTPUT);
+  digitalWrite(config::STBY, HIGH);
   pinMode(config::ENCA_C1, INPUT_PULLUP);
   pinMode(config::ENCA_C2, INPUT_PULLUP);
   pinMode(config::ENCB_C1, INPUT_PULLUP);
   pinMode(config::ENCB_C2, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(config::ENCA_C1), encoderAIsr, CHANGE);
   attachInterrupt(digitalPinToInterrupt(config::ENCB_C1), encoderBIsr, CHANGE);
-  log.logMsg("Encoders initialized");
+  log.logFmt("Encoders initialized, STBY=%d", digitalRead(config::STBY));
 }
 
 void MotorDriver::driveMotors(int m1, int m2, MotorState state, const char* label) {
+  digitalWrite(config::STBY, HIGH);
   if (log_) {
     log_->logFmt(label, m1, m2);
   }
@@ -77,6 +80,7 @@ void MotorDriver::backward(int speed) {
 }
 
 void MotorDriver::brake() {
+  digitalWrite(config::STBY, HIGH);
   motor1.brake();
   motor2.brake();
   commandCount_++;

@@ -380,6 +380,43 @@ void GridNavigator::traverseSection(int id) {
     if (scanPause()) return;
     executeTimedCommand("left", timedTurn90Sec_);
     enterState(DriveState::Stopped, "TimedGrid complete 3");
+  } else if (id == 4) {
+    // ID4: C1 -> C2 -> B2 -> B3 -> A3 -> A4
+    executeTimedCommand("forward", timedForwardSec_);
+    if (scanPause()) return;
+    executeTimedCommand("left", timedTurn90Sec_);
+    executeTimedCommand("forward", timedForwardSec_);
+    if (scanPause()) return;
+    executeTimedCommand("right", timedTurn90Sec_);
+    executeTimedCommand("forward", timedForwardSec_);
+    if (scanPause()) return;
+    executeTimedCommand("left", timedTurn90Sec_);
+    executeTimedCommand("forward", timedForwardSec_);
+    if (scanPause()) return;
+    executeTimedCommand("right", timedTurn90Sec_);
+    executeTimedCommand("forward", timedForwardSec_);
+    if (scanPause()) return;
+    enterState(DriveState::Stopped, "TimedGrid complete 4");
+  } else if (id == 5) {
+    // ID5: C1 -> D1 -> D2 -> C2 -> C3 -> D3 -> D4
+    executeTimedCommand("forward", timedForwardSec_);
+    if (scanPause()) return;
+    executeTimedCommand("left", timedTurn90Sec_);
+    executeTimedCommand("forward", timedForwardSec_);
+    if (scanPause()) return;
+    executeTimedCommand("left", timedTurn90Sec_);
+    executeTimedCommand("forward", timedForwardSec_);
+    if (scanPause()) return;
+    executeTimedCommand("right", timedTurn90Sec_);
+    executeTimedCommand("forward", timedForwardSec_);
+    if (scanPause()) return;
+    executeTimedCommand("right", timedTurn90Sec_);
+    executeTimedCommand("forward", timedForwardSec_);
+    if (scanPause()) return;
+    executeTimedCommand("left", timedTurn90Sec_);
+    executeTimedCommand("forward", timedForwardSec_);
+    if (scanPause()) return;
+    enterState(DriveState::Stopped, "TimedGrid complete 5");
   } else {
     log_.logMsg("TimedGrid section: unknown DEVICE_ID");
     enterState(DriveState::Stopped, "TimedGrid invalid id");

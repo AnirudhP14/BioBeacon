@@ -1,0 +1,47 @@
+/*
+ * This ESP32 code is created by esp32io.com
+ *
+ * This ESP32 code is released in the public domain
+ *
+ * For more detail (instruction and wiring diagram), visit https://esp32io.com/tutorials/esp32-button-led
+ */
+
+ #include <Arduino.h>
+
+
+#define BUTTON_PIN  18 // ESP32 pin GPIO18, which connected to button
+#define LED_PIN     21 // ESP32 pin GPIO21, which connected to led
+
+// variables will change:
+int button_state = 0;   // variable for reading the button status
+
+void setup() {
+  Serial.begin(9600);
+  delay(1000); // Wait for serial to initialize
+  Serial.println("[DEBUG] Setup starting");
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, HIGH); // Turn LED on at startup for test
+    Serial.println("[DEBUG] LED turned ON for test");
+
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+    Serial.println("[DEBUG] input pin set to INPUT_PULLUP");
+
+  int initial_button = digitalRead(BUTTON_PIN);
+  Serial.print("[DEBUG] Initial button state: ");
+  Serial.println(initial_button == LOW ? "PRESSED (LOW)" : "NOT PRESSED (HIGH)");
+}
+
+void loop() {
+  button_state = digitalRead(BUTTON_PIN);
+  Serial.print("[DEBUG] Button state: ");
+  Serial.println(button_state == LOW ? "PRESSED (LOW)" : "NOT PRESSED (HIGH)");
+
+  if (button_state == LOW) {
+    Serial.println("Button Pressed ON");
+    digitalWrite(LED_PIN, LOW);
+  } else {
+    Serial.println("Button Pressed OFF");
+    digitalWrite(LED_PIN, HIGH);
+  }
+  delay(1000); // Add delay to avoid flooding serial output
+}

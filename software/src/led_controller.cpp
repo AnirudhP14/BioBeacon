@@ -52,23 +52,35 @@ void LedController::disable() {
 void LedController::setBooting() {
   baseState_ = BaseState::Booting;
   error_ = false;
+  manualOverride_ = false;
 }
 
 void LedController::setReady() {
   baseState_ = BaseState::Ready;
   error_ = false;
+  manualOverride_ = false;
 }
 
 void LedController::setDriveMode() {
   baseState_ = BaseState::Drive;
+  manualOverride_ = false;
 }
 
 void LedController::setPaused() {
   baseState_ = BaseState::Paused;
+  manualOverride_ = false;
 }
 
 void LedController::setError() {
   error_ = true;
+}
+
+void LedController::setColor(uint8_t r, uint8_t g, uint8_t b) {
+  manualOverride_ = true;
+  manualColor_ = {r, g, b};
+  if (enabled_) {
+    writeColor(manualColor_);
+  }
 }
 
 void LedController::setCO2High(bool enabled) {
@@ -136,6 +148,10 @@ void LedController::update(unsigned long now) {
     case BaseState::Paused:
       base = {kCyan[0], kCyan[1], kCyan[2]};
       break;
+  }
+
+  if (manualOverride_) {
+    base = manualColor_;
   }
 
   // STOP is an external safety override; ERROR indicates an internal fault.

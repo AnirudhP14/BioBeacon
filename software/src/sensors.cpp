@@ -15,7 +15,7 @@ Adafruit_MPU6050 mpu;
 SensorManager::SensorManager(Logger& log) : log_(log) {}
 
 void SensorManager::begin(bool runDiagnostics) {
-  Wire.begin(SDA, SCL);
+  Wire.begin(config::SDA_PIN, config::SCL_PIN);
   Wire.setClock(100000);
   log_.logMsg("I2C started");
   if (runDiagnostics) {

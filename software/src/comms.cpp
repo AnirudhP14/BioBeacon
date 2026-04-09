@@ -2,6 +2,7 @@
 
 #include <WiFi.h>
 #include "config.h"
+#include "dashboard_state.h"
 #include "logging.h"
 #include "led_controller.h"
 #include "motors.h"
@@ -68,6 +69,10 @@ void EspNowManager::update(unsigned long now) {
   sendHeartbeat(now);
 }
 
+void EspNowManager::attachDashboard(DashboardState* dashboard) {
+  dashboard_ = dashboard;
+}
+
 bool EspNowManager::isAvoiding(unsigned long now) const {
   if (!status_.rxInteresting) return false;
   return (now - status_.rxInterestingMs) < 1000;
@@ -93,6 +98,9 @@ void EspNowManager::onReceive(const uint8_t* mac, const uint8_t* incomingData, i
   status_.lastRxData = msg;
   status_.lastRxMs = millis();
   status_.lastRxValid = true;
+  if (dashboard_) {
+    dashboard_->onPeerPacket(msg, now);
+  }
   if (msg.command[0] != '\0') {
     handleCommand(msg.command);
   }
@@ -199,6 +207,9 @@ void EspNowManager::sendStop() {
   packet.sensors[0] = {config::SENSOR_HEARTBEAT, 0.0f};
   packet.command[0] = '\0';
   sendPacket(packet);
+  if (dashboard_) {
+    dashboard_->onLocalEvent("stop", "Stop broadcast", "Local robot sent stop propagation", "danger", millis());
+  }
   if (led_) {
     led_->setStop(true);
   }
@@ -217,6 +228,9 @@ void EspNowManager::sendBroadcastCommand(const char* command) {
     packet.command[sizeof(packet.command) - 1] = '\0';
   }
   sendPacket(packet);
+  if (dashboard_ && command) {
+    dashboard_->onLocalCommand(command, millis());
+  }
 }
 
 void EspNowManager::handleCommand(const char* command) {
@@ -232,6 +246,12 @@ void EspNowManager::handleCommand(const char* command) {
     case 3:
       gridNav_->setEndPoint(EndPoint::EndE);
       break;
+    case 4:
+      gridNav_->setEndPoint(EndPoint::EndA);
+      break;
+    case 5:
+      gridNav_->setEndPoint(EndPoint::EndE);
+      break;
     default:
       log_.logMsg("Swarm timed grid scan: invalid DEVICE_ID");
       break;
@@ -240,4 +260,12 @@ void EspNowManager::handleCommand(const char* command) {
   gridNav_->setScanMode(true);
   gridNav_->setEnabled(true);
   log_.logMsg("Swarm timed grid scan command handled");
+  if (dashboard_) {
+    dashboard_->onLocalEvent(
+        "scan_start",
+        "Swarm scan start",
+        "Timed grid scan command handled locally",
+        "info",
+        millis());
+  }
 }
