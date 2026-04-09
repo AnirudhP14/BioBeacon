@@ -5,7 +5,7 @@ ESP32 based stigmergic swarm built on esp-now.
 ![BioBeacon](./BioBeacon.jpg?raw=true)
 
 # HiveMind - BioBeacon's swarm monitoring
-![HiveMind](./hivemind.jpg?raw=true)
+![HiveMind](./hivemind.png?raw=true)
 
 # Custom PCB for BioBeacob
 ![BioBeacon ESP32 PCB](./bio_beacon_pcb.png?raw=true)
